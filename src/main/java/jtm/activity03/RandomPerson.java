@@ -10,7 +10,6 @@ public class RandomPerson {
 	private char smile;
 	
 	
-	
 	public RandomPerson() {
 		
 	}
