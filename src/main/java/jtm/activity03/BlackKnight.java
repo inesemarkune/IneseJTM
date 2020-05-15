@@ -37,6 +37,12 @@ public class BlackKnight {
 		// TODO set name of newly created knight
 		// 1. set proper count of his arms, legs and head,
 		// 2. set his status to alive
+		// 3. put reference of this knight into next free cell of knights static
+		// array
+		// 4. increase number of total and alive knights of static counters
+		// HINT: use "this.name" to access name of knight which otherwise is shadowed
+		// by parameter of constructor, which is also called "name"
+		
 		
 		this.name = name;
 		arms = 2;
@@ -44,24 +50,13 @@ public class BlackKnight {
 		head = 1;
 		alive = true;
 		
-		// 3. put reference of this knight into next free cell of knights static
-		// array
-		// 4. increase number of total and alive knights of static counters
-		
-
-		
 		for(int i = 0; i > knights.length; i++) {
 		knights[i] = this;
 		totalKnights++;
 		aliveKnights++;
 		}
 		
-		
-		
-		// HINT: use "this.name" to access name of knight which otherwise is shadowed
-		// by parameter of constructor, which is also called "name"
-		
-		}
+	}
 		
 		
 	public String cutOffArm() {
@@ -78,9 +73,8 @@ public class BlackKnight {
 		}
 		
 		return "Haah!";
-		
-		
 	}
+	
 
 	public String cutOffLeg() {
 		// TODO handle cutting off legs knight's legs in following way:
