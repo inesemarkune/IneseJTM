@@ -7,6 +7,9 @@ public class ArrayListMethods {
 	List<Integer> myList = new ArrayList<Integer>();
 
 	public List<Integer> checkArray(int comparator, int... numbers) {
+		
+		
+		
 		// TODO #1:Implement method that compares values of passed array with
 		// passed comparator.
 		// Return list with values that are smaller than comparator.
