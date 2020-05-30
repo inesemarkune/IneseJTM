@@ -8,32 +8,47 @@ package jtm.activity08;
 
 public class SimpleCalc {
 
+	static int result = 0;
+
 	// TODO specify that method can throw SimpleCalcException
-	public static int add(int a, int b)
-			{
-		// TODO implement adding operation
-		return 0;
+	public static int add(int a, int b) throws SimpleCalcException {
+
+		validateInput(a, b);
+		validateOutput(a, b, "+");
+		result = a + b;
+
+		return result;
+
 	}
 
 	// TODO specify that method can throw SimpleCalcException
-	public static int subtract(int a, int b)
-			{
+	public static int subtract(int a, int b) throws SimpleCalcException {
 		// TODO implement subtract operation
-		return 0;
+
+		validateInput(a, b);
+		validateOutput(a, b, "-");
+		result = a - b;
+
+		return result;
 	}
 
 	// TODO specify that method can throw SimpleCalcException
-	public static int multiply(int a, int b)
-			{
+	public static int multiply(int a, int b) throws SimpleCalcException {
 		// TODO implement multiply operation
-		return 0;
+		validateInput(a, b);
+		validateOutput(a, b, "*");
+		result = a * b;
+
+		return result;
 	}
 
 	// TODO specify that method can throw SimpleCalcException
-	public static int divide(int a, int b)
-			{
+	public static int divide(int a, int b) throws SimpleCalcException {
 		// TODO implement divide operation
-		return 0;
+		validateInput(a, b);
+		validateOutput(a, b, "/");
+		result = a / b;
+		return result;
 	}
 
 	// TODO Validate that inputs are in range of -10..+10 using assertions
@@ -58,24 +73,80 @@ public class SimpleCalc {
 	// assert false: "message if statement not fulfilled";
 	//
 	private static void validateInput(int a, int b) {
+		if (a < -10) {
+			assert false : "input value a: " + a + " is below -10";
+		}
 
+		else if (a > 10) {
+			assert false : "input value a: " + a + " is above 10";
+		}
+
+		else if (b < -10) {
+			assert false : "input value b: " + b + " is below -10";
+		}
+
+		else if (b > 10) {
+			assert false : "input value b: " + b + " is above 10";
+		}
+
+		else if (a < -10 && b < -10) {
+			assert false : "input value a: " + a + " is below -10 and b: " + b + " is below -10";
+		}
+
+		else if (a > 10 && b < -10) {
+			assert false : "input value a: " + a + " is above 10 and b: " + b + " is below -10";
+		}
+
+		else if (a < -10 && b > 10) {
+			assert false : "input value a: " + a + " is below -10 and b: " + b + " is above 10";
+		}
+
+		else if (a > 10 && b > 10) {
+			assert false : "input value a: " + a + " is above 10 and b: " + b + " is above 10";
+		}
 	}
 
 	// TODO use this method to check that result of operation is also in
 	// range of -10..+10.
 	// If result is not in range:
-	//     throw SimpleCalcException with message:
-	//     "output value a oper b = result is above 10"
-	//     "output value a oper b = result is below -10"
-	//     where oper is +, -, *, /
+	// throw SimpleCalcException with message:
+	// "output value a oper b = result is above 10"
+	// "output value a oper b = result is below -10"
+	// where oper is +, -, *, /
 	// Else:
-	//     return result
+	// return result
 	// Hint:
 	// If division by zero is performed, catch original exception and create
 	// new SimpleCalcException with message "division by zero" and add
 	// original division exception as a cause for it.
-	private static int validateOutput(int a, int b, String operation)
-			{
-		return 0;
+	private static int validateOutput(int a, int b, String operation) throws SimpleCalcException {
+
+		if (operation == "+") {
+			result = add(a, b);
+		} else if (operation == "-") {
+			result = subtract(a, b);
+		} else if (operation == "*") {
+			result = multiply(a, b);
+		} else if (operation == "/") {
+			result = divide(a, b);
+		}
+
+		if (result < -10) {
+			throw new SimpleCalcException("output value " + a + operation + b + " = result is below -10");
+		} else if (result > 10) {
+			throw new SimpleCalcException("output value " + a + operation + b + " = result is above 10");
+		} else {
+			try {
+				result = a / b;
+				if (b == 0) {
+					throw new SimpleCalcException("division by zero");
+				}
+			} catch (SimpleCalcException e) {
+				throw new SimpleCalcException("division by zero", e);
+			}
+
+			return result;
+		}
+
 	}
 }
