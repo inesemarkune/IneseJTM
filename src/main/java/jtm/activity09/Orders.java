@@ -41,26 +41,28 @@ import java.util.Set;
 //Implement Iterator interface with Orders class
 public class Orders implements Iterator<Order> {
 
-	// - Orders() — create new empty Orders
 	private int currentOrder = -1;
 
+	// - Orders() — create new empty Orders
 	List<Order> orders = new LinkedList<Order>();
-	// private Order current;
 
 	Iterator<Order> iterator = orders.iterator();
 
 	public void add(Order item) {
-		while (iterator.hasNext()) {
+		if (iterator.hasNext()) {
 			orders.add(item);
 		}
 	}
 
 	public List<Order> getItemsList() {
-		
-		List<Order> result = null;
 
-		return result;
+		Orders result = null;
 
+		for (int i = -1; i < orders.size(); i++) {
+			orders.get(i);
+		}
+
+		return (List<Order>) result;
 	}
 
 	public Set<Order> getItemsSet() {
@@ -68,7 +70,6 @@ public class Orders implements Iterator<Order> {
 		Set<Order> emptySet = Collections.emptySet();
 		assertTrue(emptySet.isEmpty());
 		return emptySet;
-
 	}
 
 	public void sort() {
@@ -88,23 +89,23 @@ public class Orders implements Iterator<Order> {
 	@Override
 	public String toString() {
 		Order o = new Order(null, null, currentOrder);
-		return ".*" + o.name +".*" + o.customer + ".*";
+		return ".*" + o.name + ".*" + o.customer + ".*";
 	}
 
 	@Override
 	public boolean hasNext() {
 		boolean result = false;
-		
-		if(iterator.hasNext()) {
+
+		if (iterator.hasNext()) {
 			Order o = iterator.next();
-			if(o != null) {
+			if (o != null) {
 				result = true;
-			}else {
+			} else {
 				result = false;
 			}
 		}
 		return result;
-	
+
 	}
 
 	@Override
