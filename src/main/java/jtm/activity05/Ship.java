@@ -8,11 +8,11 @@ import jtm.activity04.Transport;
 public class Ship extends Transport {
 	
 	protected byte sails;
-	private String id;
+	//private String id;
 	
 	public Ship(String id, byte sails) {
 		super(id, 0, 0);
-		this.id = id;
+		//this.id = id;
 		this.sails = sails;
 		
 	}

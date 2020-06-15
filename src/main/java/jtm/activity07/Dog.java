@@ -8,14 +8,23 @@ public class Dog extends Mammal{
 
 	public void setName(String name) {
 		
-		if(name == null || name.length() < 1 || !name.matches("[a-zA-Z]+")) {
+		
+		if(name.matches("[A-Z][a-z]*")) {
+			this.name = name;
+		}else {
+			this.name = "";
+		}
+		
+		
+		
+		
+		/*if(name == null || name.length() < 1 || !name.matches("[a-zA-Z]+")) {
 			this.name = "";
 		}else if (name.length() == 1) {
 	        this.name = name.toUpperCase();
 	    }else {
 			this.name = name.substring(0,1).toUpperCase() + name.substring(1);
-
-		}
+		}*/
 	}
 		
 	

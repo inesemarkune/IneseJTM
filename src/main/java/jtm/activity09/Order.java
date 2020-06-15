@@ -55,16 +55,27 @@ public class Order implements Comparable<Order> {
 	// - public boolean equals(Object object) — check equality of orders
 	@Override
 	public boolean equals(Object object) {
+		
+		/*
+		 * if(object instanceof Order) {
+		 * 		Order order = (Order) object;
+		 * 		if(this.compareTo(order) == 0){
+		 *  	     return true;
+		 *       }
+		 *  return false;
+		 * }
+		 */
+		
 		boolean result = false;
 		if (!(object == null) && (object instanceof Order)) {
 
 			Order order = (Order) object;
 
 			if (name == order.name && customer == order.customer && count == order.count) {
-				return true;
+				result = true;
 			} else {
 
-				return false;
+				result = false;
 			}
 		}
 		return result;
@@ -74,6 +85,12 @@ public class Order implements Comparable<Order> {
 	// collection
 	@Override
 	public int hashCode() {
+		/*
+		 * return toString().hashCode();
+		 */
+		
+		
+		
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + count;

@@ -48,8 +48,8 @@ public class StreamEditor {
 
 		if (args == null || args.length != 4) {
 			System.err.println("Please use arguments: [-]lineNo (TextToAdd/Replace|-) (inputFile|-) (outputFile|-)");
+			System.exit(1);
 		}
-		System.exit(1);
 
 		// TODO Get integer from the 1st argument. Note that line should be
 		// deleted if number is negative.
@@ -58,6 +58,7 @@ public class StreamEditor {
 		inLineNo = Integer.parseInt(args[0]);
 		if (inLineNo < 0) {
 			delete = true;
+			inLineNo = Math.abs(inLineNo);// assigns positive value to store always.
 		}
 
 		// TODO set value of the string from 1st parameter into content
@@ -69,14 +70,15 @@ public class StreamEditor {
 		 * 2. Otherwise check if file exists (if it doesn't, create it) and 
 		 *    add reader to this file.
 		 */
-		inFile = new File(args[2]);
-		reader = new BufferedReader(new FileReader(inFile));
-		String s = reader.readLine();
-		if (s.equals("-")) {
+		inFileName = args[2];
+		if (inFileName.equals("-")) {
 			reader = new BufferedReader(new InputStreamReader(System.in));
-			s = reader.readLine();
-		} else if (!inFile.exists()) {
-			inFile.createNewFile();
+		} else {
+			inFile = new File(inFileName);
+			if (!inFile.exists()) {
+				inFile.createNewFile();
+			}
+			reader = new BufferedReader(new FileReader(inFile));
 		}
 
 		/*- TODO Initialize new buffered character writer (PrintWriter) and:
@@ -84,13 +86,11 @@ public class StreamEditor {
 		 *  2. Otherwise initialize writer to the file of given name.
 		 */
 
-		inFile = new File(args[3]);
-		writer = new PrintWriter(new FileWriter(inFile));
-		String s2 = reader.readLine();
-		if (s2.equals("-")) {
-			writer = new PrintWriter(new OutputStreamWriter(System.out));
+		outFileName = args[3];
+		if (outFileName.equals("-")) {
+			writer = new PrintWriter(System.out);
 		} else {
-			writer = new PrintWriter(args[3]);
+			writer = new PrintWriter(outFileName);
 		}
 
 		// TODO Read lines in loop from passed file/standard input till to the
@@ -100,26 +100,38 @@ public class StreamEditor {
 		// NOTE: append break at the end of written line only if it is NOT null
 		// or empty string!
 
-		while ((s = reader.readLine()) != null) {
+		while ((curLineContent = reader.readLine()) != null && curLineContent.length() != 0) {
 			curLineNo++;
 
-			if (delete == false) {
-
+			// Deal with replacement if necessary number was reached.
+			if (curLineNo == inLineNo) {
+				if (delete) {
+					continue;
+				} else {
+					writer.println(content);
+				}
+			} else {// just print it out.
+				writer.println(curLineContent);
 			}
-
 		}
 
 		// TODO If number of input line is larger than number of lines in file,
 		// pad file with empty lines before necessary line.
 
+		if (curLineNo < inLineNo) {
+			while (curLineNo < inLineNo - 1) {
+				curLineNo++;
+				writer.println();
+			}
+			writer.println(content);
+		}
+
 		// TODO flush cache of the writer and close connections of the reader
 		// and writer
 
-		
-		 writer.flush(); 
-		 reader.close(); 
-		 writer.close();
-		 
+		reader.close();
+		writer.flush();
+		writer.close();
 
 	}
 

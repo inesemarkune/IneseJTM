@@ -50,11 +50,10 @@ public class BlackKnight {
 		head = 1;
 		alive = true;
 		
-		for(int i = 0; i > knights.length; i++) {
-		knights[i] = this;
+		knights[totalKnights] = this;
 		totalKnights++;
 		aliveKnights++;
-		}
+	
 		
 	}
 		
@@ -66,13 +65,15 @@ public class BlackKnight {
 		// Else return just "Haah!"
 		
 		if(!alive) {
-			System.out.println("Only chicken beats dead!");
+			return "Only chicken beats dead!";
 		}else if(arms > 0) {
 			arms--;
-			System.out.println("Bugger!");
+			return"Bugger!";
+		}else {
+			return "Haah!";
 		}
 		
-		return "Haah!";
+		
 	}
 	
 
@@ -83,13 +84,17 @@ public class BlackKnight {
 		// Else return just "Haah!"
 		
 		if(!alive) {
-			System.out.println("Only chicken beats dead!");
-		}else if(legs > 0) {
+			return "Only chicken beats dead!";
+		}
+		if(legs > 0) {
 			legs--;
-			System.out.println("Bollocks!");
+			return "Bollocks!";
+			
+		}else {
+			return "Haah!";
 		}
 		
-		return "Haah!";
+		
 	}
 
 	public String cutOffHead() {
@@ -104,17 +109,36 @@ public class BlackKnight {
 		
 		
 		if(!alive) {
-			System.out.println("Only chicken beats dead!");
-		}else if(alive) {
+			return "Only chicken beats dead!";
+		}else {
 			head--;
+			alive = false;
 			aliveKnights--;
 			deadKnights++;
-			if(aliveKnights > 0) {
-				System.out.println("You'll never win! Arthur, Cnut will still fight!");
-			}
+			
 		}
+		if(aliveKnights > 0) {
+			
+				return "You'l newer win! " + aliveKnights() + " will still fight!";
+			
+		}else {
+			return "You'l burn in hell forever!";
+		}
+			
+	}	
 		
-		return "You'll burn in hell forever!";
+
+	private String aliveKnights() {
+		StringBuilder sb = new StringBuilder("");
+		String delim = "";
+		for(int i = 0; i < knights.length; i++) {
+			if(knights[i].alive) {
+				sb.append(delim + knights[i].name);
+				delim = ", ";
+			}
+			
+		}
+		return sb.toString();
 		
 	}
 

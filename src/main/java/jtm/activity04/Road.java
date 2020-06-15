@@ -23,6 +23,9 @@ public class Road {
 	 * values or 0 to all object properties
 	 */
 	public Road() {
+		from = "";
+		to = "";
+		distance = 0;
 	}
 
 	/*- TODO #3

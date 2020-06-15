@@ -14,7 +14,7 @@ public class LetsRide {
 	public LetsRide(int busStopCount, int passengersInStop, int seatsCount) {
 		this.busStopCount = busStopCount;
 		this.seatsCount = seatsCount;
-		passengersInStop = busStopCount + 1;
+		passengersInStop = busStopCount ;
 		// TODO #1: Set passed values to LetsRide object
 	}
 

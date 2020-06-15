@@ -8,12 +8,12 @@ import jtm.activity04.Transport;
 public class Vehicle extends Transport {
 	
 	protected int wheels;
-	private String id;
+	//private String id;
 
 	public Vehicle(String id, float consumption, int tankSize, int wheels) {
 		super(id, consumption, tankSize);
 		this.wheels = wheels;
-		this.id = id;
+		//this.id = id;
 		
 	}
 	

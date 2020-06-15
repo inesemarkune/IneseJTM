@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -41,81 +42,8 @@ import java.util.Set;
 //Implement Iterator interface with Orders class
 public class Orders implements Iterator<Order> {
 
-	private int currentOrder = -1;
-
-	// - Orders() — create new empty Orders
-	List<Order> orders = new LinkedList<Order>();
-
-	Iterator<Order> iterator = orders.iterator();
-
-	public void add(Order item) {
-		if (iterator.hasNext()) {
-			orders.add(item);
-		}
-	}
-
-	public List<Order> getItemsList() {
-
-		Orders result = null;
-
-		for (int i = -1; i < orders.size(); i++) {
-			orders.get(i);
-		}
-
-		return (List<Order>) result;
-	}
-
-	public Set<Order> getItemsSet() {
-
-		Set<Order> emptySet = Collections.emptySet();
-		assertTrue(emptySet.isEmpty());
-		return emptySet;
-	}
-
-	public void sort() {
-
-	}
-
-	public void remove() {
-
-		if (iterator.hasNext()) {
-			iterator.next();
-			iterator.remove();
-		} else {
-			throw new IllegalStateException();
-		}
-	}
-
-	@Override
-	public String toString() {
-		Order o = new Order(null, null, currentOrder);
-		return ".*" + o.name + ".*" + o.customer + ".*";
-	}
-
-	@Override
-	public boolean hasNext() {
-		boolean result = false;
-
-		if (iterator.hasNext()) {
-			Order o = iterator.next();
-			if (o != null) {
-				result = true;
-			} else {
-				result = false;
-			}
-		}
-		return result;
-
-	}
-
-	@Override
-	public Order next() {
-		if (!hasNext()) {
-			throw new NoSuchElementException();
-		}
-		Order currentOrder = next();
-		return currentOrder;
-	}
+	private int currentOrder; // index of current order in the order list
+	List<Order> orders;
 	/*-
 	 * TODO #1
 	 * Create data structure to hold:
@@ -126,4 +54,89 @@ public class Orders implements Iterator<Order> {
 	 *   2. when constructing list of orders, set number of current order to -1
 	 *      (which is usual approach when working with iterateable collections).
 	 */
+
+	// create new empty Orders
+	public Orders() {
+		orders = new LinkedList<Order>();
+		currentOrder = -1;
+	}
+
+	// add passed order to the Orders
+	public void add(Order item) {
+		orders.add(item);
+	}
+
+	// List of all customer orders
+	public List<Order> getItemsList() {
+		return orders;
+	}
+
+	// calculated Set of Orders from list (look at description below)
+	public Set<Order> getItemsSet() {
+
+		Set<Order> orderSet = new LinkedHashSet<Order>();
+		Order previousOrder = null;
+		sort();
+		for (Order order : orders) {
+			if (previousOrder == null) {
+				previousOrder = order;
+				continue;
+			}
+			if (order.name.equals(previousOrder.name)) {
+				previousOrder.count += order.count;
+				previousOrder.customer += "," + order.customer;
+			} else {
+				orderSet.add(previousOrder);
+				previousOrder = order;
+			}
+		}
+		if (previousOrder != null) {
+			orderSet.add(previousOrder);
+		}
+
+		// to make set sorted, create a new one from the existing one
+		return new LinkedHashSet<Order>(orderSet);
+
+	}
+
+	public void sort() {
+		Collections.sort(orders);
+	}
+
+	public void remove() {
+
+		if (currentOrder >= 0 && currentOrder < orders.size()) {
+			orders.remove(currentOrder);
+			currentOrder--;
+		} else {
+			throw new IllegalStateException();
+		}
+	}
+
+	@Override
+	public String toString() {
+
+		return orders.toString();
+	}
+
+	@Override
+	public boolean hasNext() {
+
+		if (orders.size() > 0 && currentOrder < orders.size()) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	@Override
+	public Order next() {
+		if (hasNext()) {
+			currentOrder++;
+			return orders.get(currentOrder);
+		} else {
+			throw new NoSuchElementException();
+		}
+	}
 }

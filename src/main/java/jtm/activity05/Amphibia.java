@@ -27,7 +27,7 @@ public class Amphibia extends Transport {
 		float minFuel = (this.getConsumption() * road.getDistance()) / 100;
 		
 		if(getFuelInTank() >= minFuel && road.getClass() == Road.class){
-			setFuelInTank(getFuelInTank() - minFuel);
+			super.move(road);
 			
 			 
 			return String.format(Locale.US, "%s is driving on %s with %d wheels", getType(),road.toString(), wheels);
