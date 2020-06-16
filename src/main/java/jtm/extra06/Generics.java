@@ -5,17 +5,49 @@ import java.util.LinkedList;
 // import statically jtm.extra06.GenericsTest.log StringBuilder object
 // from the closed source unit test
 // Note that necessary messages should be written there
+import static jtm.extra06.GenericsTest.log;
 
+
+	
 public class Generics<E extends Number> extends LinkedList<E> {
-	// TODO #2
+
+	/**
+	 * 
+	 */
+	//StringBuilder sb = new StringBuilder();
+	
 	// Use Eclipse code generation prompter to add generated serial version ID
 	// for this class to avoid warning
-
-	// TODO #3
+	private static final long serialVersionUID = 7708818085602746688L;
+	
+	
 	// Select Source— Generate Constructors from Superclass... and select
 	// LinkedList<E>().
 	// And implement extended constructor that after new Generics object is
 	// created, log has appended line "Generics instance created"
+	public Generics() {
+		super();
+		log.append("Generics instance created");
+	}
+
+
+	
+	@Override
+	public void push(E e) {
+		log.append(" " + e.getClass().getName() + ": " + e.doubleValue() + " pushed ");
+		super.push(e);
+	}
+
+
+	@Override
+	public E pop() {
+		// TODO Auto-generated method stub
+		
+		log.append(this.ge + ": " + this.peek() + " popped ");
+		return super.pop();
+	}
+	
+	
 
 	// TODO #4
 	// Select menu: Source— Override/Implement methods..., extend LinkedList<E>

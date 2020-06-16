@@ -11,6 +11,8 @@ public enum Holiday {
 
 	Holiday(int month, int day) {
 		// TODO #1 implement class variables for month and day of the holiday
+		this.month = month;
+		this.day = day;
 	}
 
 	public static Holiday getNearest(int currentMonth, int currentDay) {
@@ -20,6 +22,15 @@ public enum Holiday {
 		// are
 		// no more holidays this year, first holiday in the list will be the
 		// next.
+		
+		int minDiff = -1;
+		for(Holiday day : Holiday.values()) {
+			int diff = Math.abs(currentMonth - enum.getMonth());
+		}
+		
+		
+		
+		
 		return returnHoliday;
 	}
 
