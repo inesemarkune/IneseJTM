@@ -43,7 +43,7 @@ public class Generics<E extends Number> extends LinkedList<E> {
 	public E pop() {
 		// TODO Auto-generated method stub
 		
-		log.append(this.ge + ": " + this.peek() + " popped ");
+		log.append(this. + ": " + this.peek() + " popped ");
 		return super.pop();
 	}
 	
