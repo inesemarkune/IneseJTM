@@ -5,26 +5,25 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+
 import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import jdk.internal.org.jline.utils.Log;
 
 public class TeacherManager {
 
 	protected Connection conn;
+	
+	//Start
+	private static Logger log = Logger.getLogger(TeacherManager.class);
 	static final String url = "jdbc:mysql://localhost:3306/?autoReconnect=true&useSSL=false&characterEncoding=utf8";
 	static final String user = "root";
 	static final String pass = "Krejums123";
 
-	ResultSet rs = null;
-	Teacher teacher = null;
-	PreparedStatement stmt;
-
+	
 	public TeacherManager() {
 
 		// TODO #1 When new TeacherManager is created, create connection to the
@@ -45,7 +44,7 @@ public class TeacherManager {
 				conn = DriverManager.getConnection(url, user, pass);
 				conn.setAutoCommit(false);
 			} catch (Exception e) {
-				e.getMessage();
+				log.debug(e.getMessage());
 			}
 		}
 	}
@@ -55,45 +54,32 @@ public class TeacherManager {
 	 * 
 	 * @param id the ID of teacher
 	 * @return a Teacher object
-	 * @throws ClassNotFoundException
+	 * 
 	 */
 
-	public Teacher findTeacher(int id) throws ClassNotFoundException {
+	public Teacher findTeacher(int id) {
 		// TODO #2 Write an sql statement that searches teacher by ID.
 		// If teacher is not found return Teacher object with zero or null in
 		// its fields!
 		// Hint: Because default database is not set in connection,
 		// use full notation for table "database_activity.Teacher"
-
+		Teacher teacher = new Teacher(0,null,null);
+		
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection(url, user, pass);
-			stmt = conn.prepareStatement("SELECT * FROM database_activity.teacher where id = ?");
-			stmt.setInt(1, id);
-			rs = stmt.executeQuery();
-
-			if (rs.next()) {
-				teacher = new Teacher();
-				teacher.setId(rs.getInt("id"));
-				teacher.setFirstName(rs.getString("firstName"));
-				teacher.setLastName(rs.getString("lastname"));
-
-			} else {
-				teacher = new Teacher();
-				teacher.setId(rs.getInt(0));
-				teacher.setFirstName(rs.getString(null));
-				teacher.setLastName(rs.getString(null));
-
+			PreparedStatement pStmt = null;
+			pStmt = conn.prepareStatement("SELECT * FROM database_activity.Teacher WHERE id = ? " );
+			pStmt.setInt(1, id);
+			conn.commit();
+			ResultSet rs = pStmt.executeQuery();
+			if(rs.next()) {
+				teacher = new Teacher(rs.getInt(1), rs.getString(2), rs.getString(3));
+				return teacher;
 			}
-		} catch (SQLException se) {
-
-			se.printStackTrace();
-
-		} finally {
-
+				
+		}catch(SQLException e) {
+			log.debug(e.getMessage());	
 		}
 		return teacher;
-
 	}
 
 	/**
@@ -104,7 +90,7 @@ public class TeacherManager {
 	 * @param lastName  the last name of teacher.
 	 * @return a list of Teacher object.
 	 */
-	public List<Teacher> findTeacher(String firstName, String lastName) throws Exception {
+	public List<Teacher> findTeacher(String firstName, String lastName) {
 
 		// TODO #3 Write an sql statement that searches teacher by first and
 		// last name and returns results as ArrayList<Teacher>.
@@ -112,28 +98,27 @@ public class TeacherManager {
 		// in form ...like '%value%'... should be returned
 		// Note, that if nothing is found return empty list!
 
-		List<Teacher> list = new ArrayList<>();
+		List<Teacher> list = new ArrayList<Teacher>();
 
 		try {
-			conn = DriverManager.getConnection(url, user, pass);
-			stmt = conn.prepareStatement(
-					"SELECT * FROM database_activity.teacher where firstname LIKE ? and lastname LIKE ?");
-			stmt.setString(1, firstName);
-			stmt.setString(2, lastName);
-			rs = stmt.executeQuery();
-
-			if (!rs.next()) {
-				return Collections.emptyList();
-			} else {
-				while (rs.next()) {
-					teacher.setFirstName(rs.getString("firstName"));
-					teacher.setLastName(rs.getString("lastname"));
-					list.add(teacher);
-				}
+			conn.setAutoCommit(false);
+			PreparedStatement stmt = conn.prepareStatement ("SELECT * FROM database_activity.Teacher where firstname LIKE ? and lastname LIKE ? "
+					+ "order by ID ASC");
+			
+			stmt.setString(1, "%" + firstName + "%");
+			stmt.setString(2, "%" + lastName + "%");
+			conn.commit();
+			
+			ResultSet rs = stmt.executeQuery();
+			while(rs.next()) {
+				list.add(new Teacher(rs.getInt("ID"), rs.getString("firstname"), rs.getString("lastname")));
 			}
+			
+			rs.close();
+			stmt.close();
 
-		} catch (Exception ex) {
-			throw new Exception("Error: " + ex.getMessage());
+		} catch (SQLException e) {
+			log.debug(e.getMessage());
 		}
 
 		return list;
@@ -145,33 +130,25 @@ public class TeacherManager {
 	 * @param firstName the first name of teacher
 	 * @param lastName  the last name of teacher
 	 * @return true if success, else false.
-	 * @throws ClassNotFoundException
+	 * 
 	 * 
 	 */
 
-	public boolean insertTeacher(String firstName, String lastName) throws ClassNotFoundException {
+	public boolean insertTeacher(String firstName, String lastName) {
 		// TODO #4 Write an sql statement that inserts teacher in database.
-		boolean result = false;
+		
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection(url, user, pass);
-			stmt = conn.prepareStatement("INSERT INTO database_activity.teacher (firstname, lastname) VALUES (?, ?)");
-			stmt.setString(1, firstName);
-			stmt.setString(2, lastName);
-			rs = stmt.executeQuery();
-
-			int i = stmt.executeUpdate();
-			if (i > 0) {
-				result = true;
-			} else {
-				result = false;
-			}
-
+			PreparedStatement pstmt = conn.prepareStatement("INSERT INTO database_activity.Teacher (firstname, lastname) VALUES (?, ?)");
+			pstmt.setString(1, firstName);
+			pstmt.setString(2, lastName);
+			pstmt.executeUpdate();
+			conn.commit();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			log.debug(e.getMessage());
+			return false;
 		}
 
-		return result;
+		return true;
 	}
 
 	/**
@@ -179,23 +156,27 @@ public class TeacherManager {
 	 * 
 	 * @param teacher
 	 * @return true on success, false on error (e.g. non-unique id)
-	 * @throws SQLException
-	 * @throws ClassNotFoundException 
 	 */
-	public boolean insertTeacher(Teacher teacher) throws SQLException, ClassNotFoundException {
+	public boolean insertTeacher(Teacher teacher) {
 		// TODO #5 Write an sql statement that inserts teacher in database.
+		boolean status = false;
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection(url, user, pass);
-			stmt = conn.prepareStatement("INSERT INTO database_activity.teacher VALUES (?,?,?)");
-			stmt.setObject(1, teacher);
-			rs = stmt.executeQuery();
-	 
-		}catch(SQLException e) {
-			e.printStackTrace();
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO database_activity.Teacher (id, firstname, lastname) VALUES (?,?,?)");
+			stmt.setString(1, Integer.toString(teacher.getId()));
+			stmt.setString(2, teacher.getFirstName());
+			stmt.setString(3, teacher.getLastName());
+			int rows = stmt.executeUpdate();
+			conn.commit();
+			
+			if(rows == 1) {
+				status = true;
+			}
+		}catch(Exception e) {
+			log.debug(e.getMessage());
+			status = false;
 		}
 		
-		return false;
+		return status;
 	}
 
 	/**
@@ -204,23 +185,27 @@ public class TeacherManager {
 	 * 
 	 * @param teacher a Teacher object, which contain information for updating.
 	 * @return true if row was updated.
-	 * @throws SQLException
-	 * @throws ClassNotFoundException 
 	 */
-	public boolean updateTeacher(Teacher teacher) throws SQLException, ClassNotFoundException {
+	public boolean updateTeacher(Teacher teacher) {
 		boolean status = false;
 		// TODO #6 Write an sql statement that updates teacher information.
 		try {
-		Class.forName("com.mysql.jdbc.Driver");
-		conn = DriverManager.getConnection(url, user, pass);
-		stmt = conn.prepareStatement("UPDATE database_activity.teacher SET id = ?, firstname = ?, lastname = ? ");
-		stmt.setObject(1, teacher);
-		rs = stmt.executeQuery();
-		conn.commit();
-		}catch(SQLException e) {
-			e.printStackTrace();
+			PreparedStatement stmt = conn.prepareStatement("UPDATE database_activity.Teacher SET firstname = ?, lastname = ? " + "where ID = ?");
+			stmt.setString(1, teacher.getFirstName());
+			stmt.setString(2, teacher.getLastName());
+			stmt.setInt(3,  teacher.getId());
+			int rows = stmt.executeUpdate();
+			conn.commit();
+			stmt.close();
+			
+			if(rows == 1) {
+				status = true;
+			}
+		}catch(Exception e) {
+			log.debug(e.getMessage());
+			status = false;
 		}
-		return false;
+		return status;
 	}
 
 	/**
@@ -229,31 +214,36 @@ public class TeacherManager {
 	 * 
 	 * @param id the ID of teacher.
 	 * @return true if row was deleted.
-	 * @throws SQLException
-	 * @throws ClassNotFoundException 
 	 */
-	public boolean deleteTeacher(int id) throws SQLException, ClassNotFoundException {
+	public boolean deleteTeacher(int id) {
 		// TODO #7 Write an sql statement that deletes teacher from database.
-	try {
-		Class.forName("com.mysql.jdbc.Driver");
-		conn = DriverManager.getConnection(url, user, pass);
-		stmt = conn.prepareStatement("DELETE FROM database_activity.teacher WHERE id= ?");
-		stmt.setInt(1, id);
-		rs = stmt.executeQuery();
-		conn.commit();
-	}catch(SQLException e) {
-			e.printStackTrace();
+		boolean status = false;
+		try {
+			PreparedStatement stmt = conn.prepareStatement("DELETE FROM database_activity.Teacher WHERE id= " + id);
+			int rows = stmt.executeUpdate();
+			conn.commit();
+			stmt.close();
+			
+			if(rows == 1) {
+				status = true;
+			}else {
+				status = false;
+			}
+		}catch(SQLException e) {
+				log.debug(e.getMessage());
+				status = false;
+		}
+			return status;
 	}
-		return false;
-	}
-
+	
 	public void closeConnecion() {
 		// TODO Close connection to the database server and reset conn object to null
 		try {
 			if (conn != null)
 				conn.close();
-		} catch (SQLException se) {
-			se.printStackTrace();
+			conn = null;
+		} catch (Exception e) {
+			log.debug(e.getMessage());
 		}
 	}
 }

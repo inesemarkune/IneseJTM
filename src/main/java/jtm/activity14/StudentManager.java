@@ -26,6 +26,18 @@ public class StudentManager {
 		// for tests need to be executed server-wise, not just database-wise.
 		// 2. Set AutoCommit to false and use conn.commit() where necessary in
 		// other methods
+		
+		if (conn == null) {
+			try {
+				Class.forName("com.mysql.jdbc.Driver");
+				conn = DriverManager.getConnection("jdbc:mysql://localhost/?autoReconnect=true&useSSL=false&characterEncoding=utf8", "root", "Krejums123");
+				conn.setAutoCommit(false);
+			} catch (Exception e) {
+				log.debug(e.getMessage());
+			}
+		}
+		
+		
 	}
 
 	/**
@@ -41,7 +53,23 @@ public class StudentManager {
 		// its fields!
 		// Hint: Because default database is not set in connection,
 		// use full notation for table "database_activity.Student"
-		return null;
+		
+		Student student = new Student(0,null,null);
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM database_activity.Student WHERE id = ?" );
+			stmt.setInt(1, id);
+			conn.commit();
+			
+			ResultSet rs = stmt.executeQuery();
+			if(rs.next()) {
+				student = new Student(rs.getInt(1), rs.getString(2), rs.getString(3));
+				return student;
+			}
+		}catch(SQLException e) {
+			log.debug(e.getMessage());
+		}
+		return student;
 	}
 
 	/**
@@ -60,7 +88,28 @@ public class StudentManager {
 		// Note that search results of partial match
 		// in form ...like '%value%'... should be returned
 		// Note, that if nothing is found return empty list!
-		return null;
+		
+		List<Student> list = new ArrayList<Student>();
+		
+		try {
+			conn.setAutoCommit(false);
+			PreparedStatement stmt = conn.prepareStatement("SELECT * FROM database_activity.Student where firstname LIKE ? and lastname LIKE ? "+ "order by ID ASC");
+			stmt.setString(1,  "%" + firstName + "%");
+			stmt.setString(2, "%" + lastName + "%");
+			conn.commit();
+			
+			ResultSet rs = stmt.executeQuery();
+			while(rs.next()) {
+				list.add(new Student(rs.getInt("ID"), rs.getString("firstname"), rs.getString("lastname")));
+			}
+			rs.close();
+			stmt.close();
+			
+		}catch(SQLException e) {
+			log.debug(e.getMessage());
+		}
+		
+		return list;
 
 	}
 
@@ -77,7 +126,18 @@ public class StudentManager {
 
 	public boolean insertStudent(String firstName, String lastName) {
 		// TODO #4 Write an sql statement that inserts student in database.
-		return false;
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO database_activity.Student (firstname, lastname) VALUES (?, ?)");
+			stmt.setString(1, firstName);
+			stmt.setString(2, lastName);
+			stmt.executeUpdate();
+			conn.commit();
+		}catch(SQLException e) {
+			log.debug(e.getMessage());
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -88,7 +148,26 @@ public class StudentManager {
 	 */
 	public boolean insertStudent(Student student) {
 		// TODO #5 Write an sql statement that inserts student in database.
-		return false;
+		
+		boolean status = false;
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO database_activity.Student (id, firstname, lastname) VALUES (?,?,?)");
+			stmt.setString(1, Integer.toString(student.getId()));
+			stmt.setString(2, student.getFirstName());
+			stmt.setString(3, student.getLastName());
+			int rows = stmt.executeUpdate();
+			conn.commit();
+			
+			if(rows == 1) {
+				status = true;
+			}
+			
+		}catch(Exception e) {
+			log.debug(e.getMessage());
+			status = false;
+		}
+		return status;
 	}
 
 	/**
@@ -102,7 +181,24 @@ public class StudentManager {
 	public boolean updateStudent(Student student) {
 		boolean status = false;
 		// TODO #6 Write an sql statement that updates student information.
-		return false;
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement("UPDATE database_activity.Student SET firsname = ?, lastname = ?" + "WHERE ID = ?");
+			stmt.setString(1, student.getFirstName());
+			stmt.setString(2, student.getLastName());
+			stmt.setInt(3, student.getId());
+			int rows = stmt.executeUpdate();
+			conn.commit();
+			stmt.close();
+			
+			if(rows == 1) {
+				status = true;
+			}
+		}catch(Exception e) {
+			log.debug(e.getMessage());
+			status = false;
+		}
+		return status;
 	}
 
 	/**
@@ -115,11 +211,38 @@ public class StudentManager {
 	 */
 	public boolean deleteStudent(int id) {
 		// TODO #7 Write an sql statement that deletes student from database.
-		return false;
+		boolean status  = false;
+		
+		try {
+			PreparedStatement stmt = conn.prepareStatement("DELETE FROM database_activity.Student WHERE id = " + id);
+			int rows = stmt.executeUpdate();
+			conn.commit();
+			stmt.close();
+			
+			if(rows == 1) {
+				status = true;
+			}else {
+				status = false;
+			}
+		}catch(Exception e) {
+			log.debug(e.getMessage());
+			status = false;
+		}
+		return status;
 	}
 
 	public void closeConnecion() {
 		// TODO Close connection if and reset it to release connection to the
 		// database server
+		try {
+			if(conn != null) {
+			conn.close();
+			conn = null;
+			
+			}
+		}catch(Exception e) {
+			log.debug(e.getMessage());
+		}
+		
 	}
 }
