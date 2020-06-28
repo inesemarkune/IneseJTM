@@ -18,10 +18,13 @@ public class InvoiceManager {
 		entityTransaction = em.getTransaction();
 	}
 
+	//@SuppressWarnings("null")
 	public Invoice createInvoice(Integer id) {
 		Invoice invoice = null;
 		// TODO Create new Invoice, set its id
 		// Save invoice object into database
+		invoice = new Invoice();
+		invoice.setId(id);
 		persist(invoice);
 		return invoice;
 	}
@@ -29,17 +32,31 @@ public class InvoiceManager {
 	public Item createInvoiceItem(Invoice invoice, Integer id, String name, Float price, Integer quantity) {
 		// TODO create new Item, set its properties and save it in database
 		// TODO return reference to the created item
-		return null;
+		Item invoiceItem = new Item();
+		invoiceItem.setInvoice(invoice);
+		invoiceItem.setId(id);
+		invoiceItem.setName(name);
+		invoiceItem.setPrice(price);
+		invoiceItem.setCount(quantity);
+		persist(invoiceItem);
+		return invoiceItem;
 	}
 
 	public Item createItem(Integer id, String name, Float price, Integer quantity) {
 		// TODO create new Item, set its properties and save it in database
 		// and return reference to it
-		return null;
+		Item item = new Item();
+		item.setId(id);
+		item.setName(name);
+		item.setPrice(price);
+		item.setCount(quantity);
+		persist(item);
+		return item;
 	}
 
 	public void addItemToInvoice(Invoice invoice, Item item) {
 		// TODO add passed item to the passed invoice
+		invoice.addItem(item);
 	}
 
 	public void persist(Object o) {
@@ -61,7 +78,7 @@ public class InvoiceManager {
 
 	public Item searchItem(Integer id) {
 		// TODO search item in database and return reference to it
-		return null;
+		return em.find(Item.class, id);
 	}
 
 	public void clearData() {
